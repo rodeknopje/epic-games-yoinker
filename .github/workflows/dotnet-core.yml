@@ -1,8 +1,8 @@
 name: Claim epic games
 
 on:
-  watch:
-    types: [started]    
+  # watch:
+  #  types: [started] # uncomment to manually activate it by starring your repo
   schedule:
     - cron: "0 11,23 * * *"
     
