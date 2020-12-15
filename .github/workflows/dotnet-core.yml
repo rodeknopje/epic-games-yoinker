@@ -1,8 +1,8 @@
 name: Claim epic games
 
 on:
-  # watch:
-  #  types: [started] # uncomment to manually activate it by starring your repo
+  watch:
+    types: [started] # uncomment to manually activate it by starring your repo
   schedule:
     - cron: "0 11,23 * * *"
     
@@ -22,4 +22,7 @@ jobs:
       run: dotnet restore claimer
 
     - name: Claim games
-      run: dotnet run --project claimer/claimer/claimer.csproj ${{secrets.USERNAME}} ${{secrets.PASSWORD}} ${{secrets.CAPTCHA}}
+      run: set username=${{secrets.USERNAME}}
+      run: set password=${{secrets.PASSWORD}}
+      run: set captcha=${{secrets.CAPTCHA}}
+      run: dotnet run --project claimer/claimer/claimer.csproj

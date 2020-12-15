@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -15,13 +17,20 @@ namespace epic_claimer
 
         private static WebDriverWait _wait;
 
+        private static string _username;
+        private static string _password;
+
+        private static string _captcha;
+
         private static void Main(string[] args)
         {
-            if (args.Length < 3)
+            _username = Environment.GetEnvironmentVariable("username");
+            _password = Environment.GetEnvironmentVariable("password");
+            _captcha  = Environment.GetEnvironmentVariable("captcha");
+
+            if (ValidateArguments() == false)
             {
-                Console.WriteLine("not enough parameters");
-                
-                return;
+                return; 
             }
             
             // create an instance of the webdriver
@@ -30,16 +39,16 @@ namespace epic_claimer
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(50));
             // maximize the window.
             _driver.Manage().Window.Maximize();
-            
+ 
             // if the cookie was not retrieved successfully.
-            if (GetCookie(args[2]) == false)
+            if (GetCookie(_captcha) == false)
             {
                 Console.WriteLine("Failed to retrieve authentication cookie.");
             
                 return;
             }
             
-            if (Login(args[0], args[1]) == false)
+            if (Login(_username, _password) == false)
             {
                 return;
             }
@@ -52,6 +61,33 @@ namespace epic_claimer
             }
             
             Console.WriteLine("process finished");
+        }
+        
+        private static bool ValidateArguments()
+        {
+            if (string.IsNullOrEmpty(_username) || string.IsNullOrEmpty(_password) || string.IsNullOrEmpty(_captcha))
+            {
+                Console.WriteLine("missing arguments");
+                
+                return false;
+            }
+            try
+            {
+                var mailAddress = new MailAddress(_username);
+            } 
+            catch(FormatException)
+            {
+                Console.WriteLine("email address is not valid");
+                
+                return false;
+            }
+            if (new Regex("^https:\\/\\/accounts.hcaptcha.com\\/verify_email\\/[0-9a-z-]+$").IsMatch(_captcha) == false)
+            {
+                Console.WriteLine("captcha url is not valid");
+
+                return false;
+            }
+            return true;
         }
 
         private static bool GetCookie(string url)
