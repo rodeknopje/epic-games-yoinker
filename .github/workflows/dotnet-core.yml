@@ -23,8 +23,7 @@ jobs:
 
     - name: Claim games
       run: |
-        set username=${{secrets.USERNAME}}
-        set pass=${{secrets.PASS}}
-        set captcha=${{secrets.CAPTCHA}}
-        set pwd=${{secrets.PASSWORD}}
+        $Env:epicname="${{secrets.USERNAME}}"
+        $Env:pwd="${{secrets.PASS}}"
+        $Env:captcha="${{secrets.CAPTCHA}}"
         dotnet run --project claimer/claimer/claimer.csproj
