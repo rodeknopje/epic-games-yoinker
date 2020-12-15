@@ -27,6 +27,10 @@ namespace epic_claimer
             _username = Environment.GetEnvironmentVariable("username");
             _password = Environment.GetEnvironmentVariable("pass");
             _captcha  = Environment.GetEnvironmentVariable("captcha");
+
+            Console.WriteLine($"username: {string.IsNullOrEmpty(_username)}");
+            Console.WriteLine($"pass:     {string.IsNullOrEmpty(_password)}");
+            Console.WriteLine($"captcha:  {string.IsNullOrEmpty(_captcha)}");
             
             if (ValidateArguments() == false)
             {
