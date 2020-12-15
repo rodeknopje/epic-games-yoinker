@@ -24,6 +24,6 @@ jobs:
     - name: Claim games
       run: |
         set username=${{secrets.USERNAME}}
-        set password=${{secrets.PASSWORD}}
+        set pwd=${{secrets.PASSWORD}}
         set captcha=${{secrets.CAPTCHA}}
         dotnet run --project claimer/claimer/claimer.csproj

@@ -25,7 +25,7 @@ namespace epic_claimer
         private static void Main(string[] args)
         {
             _username = Environment.GetEnvironmentVariable("username");
-            _password = Environment.GetEnvironmentVariable("password");
+            _password = Environment.GetEnvironmentVariable("pwd");
             _captcha  = Environment.GetEnvironmentVariable("captcha");
 
             if (ValidateArguments() == false)
