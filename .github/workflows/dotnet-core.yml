@@ -22,7 +22,8 @@ jobs:
       run: dotnet restore claimer
 
     - name: Claim games
-      run: set username=${{secrets.USERNAME}}
-      run: set password=${{secrets.PASSWORD}}
-      run: set captcha=${{secrets.CAPTCHA}}
-      run: dotnet run --project claimer/claimer/claimer.csproj
+      run: 
+        set username=${{secrets.USERNAME}}
+        set password=${{secrets.PASSWORD}}
+        set captcha=${{secrets.CAPTCHA}}
+        dotnet run --project claimer/claimer/claimer.csproj
