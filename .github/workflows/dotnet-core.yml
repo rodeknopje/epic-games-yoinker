@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore claimer
 
     - name: Claim games
-      run: 
+      run: |
         set username=${{secrets.USERNAME}}
         set password=${{secrets.PASSWORD}}
         set captcha=${{secrets.CAPTCHA}}
