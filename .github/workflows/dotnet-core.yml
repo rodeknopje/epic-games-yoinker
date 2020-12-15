@@ -24,6 +24,6 @@ jobs:
     - name: Claim games
       run: |
         $Env:epicname="${{secrets.USERNAME}}"
-        $Env:pwd="${{secrets.PASS}}"
+        $Env:epicpass="${{secrets.PASS}}"
         $Env:captcha="${{secrets.CAPTCHA}}"
         dotnet run --project claimer/claimer/claimer.csproj
