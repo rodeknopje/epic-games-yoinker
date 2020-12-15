@@ -26,5 +26,4 @@ jobs:
         set username=${{secrets.USERNAME}}
         set pass=${{secrets.PASS}}
         set captcha=${{secrets.CAPTCHA}}
-        set pwd=${{secrets.PASSWORD}}
         dotnet run --project claimer/claimer/claimer.csproj
