@@ -10,7 +10,7 @@ Inspritation for this project came from [xuac/claim-epic-freebies](https://githu
 ### 2. Enable and add [github secrets](../../settings/secrets) for this repository
 
    
-   <p align="ceneter"><img src="https://i.imgur.com/wJ5gXaZ.png"></p>
+   <p align="ceneter"><img src="https://i.imgur.com/jg6Awxc.png"></p>
    
    Create the secrets: `USERNAME`, `PASS` and `CAPTCHA`
    Fill you epic email in the `USERNAME` field and your password in the `PASS` field.
