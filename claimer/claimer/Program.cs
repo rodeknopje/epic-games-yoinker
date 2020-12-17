@@ -181,11 +181,13 @@ namespace epic_claimer
             _wait.Until(x => x.FindElement(By.XPath("//div[@data-component=\"CardGridDesktopBase\"]")).Displayed);
 
             Thread.Sleep(10000);
+            
+            var freeGameSection = new Regex("<h1 class=\"css-.+?\">Free Games<\\/h1>(.+?)Sales and Specials").Match(_driver.PageSource);
+            
+            var freeGameUrls = new Regex("href=\"(/store/en-US/product.+?)>").Matches(freeGameSection.Groups[0].ToString());
 
-            var urls = GetElements("//a[@aria-label[contains(., \"Free Games\")]]")
-                .Select(link => link.GetAttribute("href"))
-                .ToList();
-
+            var urls = freeGameUrls.ToList().Select(url => $"https://www.epicgames.com{url.Groups[1]}");
+                
             return urls;
         }
 
@@ -212,7 +214,7 @@ namespace epic_claimer
             Thread.Sleep(5000);
             // click the agree button
             GetElements("//button[@class=\"btn btn-primary\"]")[1].Click();
-
+            
             Thread.Sleep(5000);
 
             Console.WriteLine("Claimed");
