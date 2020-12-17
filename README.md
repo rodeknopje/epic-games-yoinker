@@ -14,7 +14,7 @@ Inspritation for this project came from [xuac/claim-epic-freebies](https://githu
    
    Create the secrets: `USERNAME`, `PASS` and `CAPTCHA`
    Fill you epic email in the `USERNAME` field and your password in the `PASS` field.
-   For the `CAPTCHA` field go to this [link](https://dashboard.hcaptcha.com/signup?type=accessibility) and fill sign up for Accessibility Access. After signing up go to your mail,    right click the button in the mail and press "copy url adress". Paste the adress in your `CAPTCHA` secret it should look like this `https://accounts.hcaptcha.com/verify_email/00000000-1a1a-2b2b-3c3c-1a2b3c4d5e6f`
+   For the `CAPTCHA` field go to this [link](https://dashboard.hcaptcha.com/signup?type=accessibility) and fill sign up for Accessibility Access. After signing up go to your mail,    right click the button in the mail and press "copy url adress". Paste the adress in your `CAPTCHA` secret it should look like this `https://accounts.hcaptcha.com/verify_email/00000000-1a1a-2b2b-3c3c-1a2b3c4d5e6f`, two-factor authentication should be disabled for now.
    
    
    
