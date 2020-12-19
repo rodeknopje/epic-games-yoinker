@@ -28,10 +28,6 @@ namespace epic_claimer
             _password = Environment.GetEnvironmentVariable("epicpass");
             _captcha = Environment.GetEnvironmentVariable("captcha");
 
-            Console.WriteLine($"username: {string.IsNullOrEmpty(_username)}");
-            Console.WriteLine($"pass:     {string.IsNullOrEmpty(_password)}");
-            Console.WriteLine($"captcha:  {string.IsNullOrEmpty(_captcha)}");
-
             if (ValidateArguments() == false)
             {
                 return;
@@ -48,7 +44,7 @@ namespace epic_claimer
             if (GetCookie(_captcha) == false)
             {
                 Console.WriteLine("Failed to retrieve authentication cookie.");
-            
+
                 return;
             }
 
@@ -111,7 +107,8 @@ namespace epic_claimer
 
                 GetElement("//button[@title=\"Click to set accessibility cookie\"]").Click();
 
-                Thread.Sleep(5000);
+                Thread.Sleep(7500);
+
 
                 if (_driver.PageSource.Contains("Cookie set."))
                 {
@@ -147,28 +144,37 @@ namespace epic_claimer
         private static bool Login(string user, string pass)
         {
             const int maxTries = 5;
-            
+
             _driver.Navigate().GoToUrl("https://www.epicgames.com/id/login/");
-            
+
             GetElement("//div[@aria-label=\"Sign in with Epic Games\"]").Click();
-            
+
+            AddEpicCookies();
+
+            var loginUrl = _driver.Url;
+
             for (var i = 0; i < maxTries; i++)
             {
                 Console.Write($"{i + 1}/{maxTries} Logging in : ");
-                
+
                 Thread.Sleep(2000);
 
-                AddEpicCookies();
-                
-                GetElement("//input[@name=\"email\"]").SendKeys(user);
-                GetElement("//input[@name=\"password\"]").SendKeys(pass);
+                var nameField = GetElement("//input[@name=\"email\"]");
+                var passField = GetElement("//input[@name=\"password\"]");
 
-                Thread.Sleep(3000);
+                nameField.Clear();
+                passField.Clear();
+
+                nameField.SendKeys(user);
+                passField.SendKeys(pass);
+
+                Thread.Sleep(1000);
 
                 GetElement("//span[text()=\"Log in now\"]").Click();
 
-                // wait for this element to be displayed
-                if(GetElement("//div[@id=\"egLogo\"]") != null)
+                Thread.Sleep(10000);
+
+                if (_driver.Url != loginUrl)
                 {
                     Console.WriteLine("success");
 
@@ -239,7 +245,8 @@ namespace epic_claimer
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine($"element not found : {xPath}");
+
                 throw;
             }
         }
