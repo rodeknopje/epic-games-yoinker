@@ -26,71 +26,74 @@ namespace epic_claimer
         {
             _username = Environment.GetEnvironmentVariable("epicname");
             _password = Environment.GetEnvironmentVariable("epicpass");
-            _captcha  = Environment.GetEnvironmentVariable("captcha");
-            
+            _captcha = Environment.GetEnvironmentVariable("captcha");
+
             Console.WriteLine($"username: {string.IsNullOrEmpty(_username)}");
             Console.WriteLine($"pass:     {string.IsNullOrEmpty(_password)}");
             Console.WriteLine($"captcha:  {string.IsNullOrEmpty(_captcha)}");
-            
+
             if (ValidateArguments() == false)
             {
-                return; 
+                return;
             }
-            
+
             // create an instance of the webdriver
             _driver = new ChromeDriver();
             // create an instance of the webdriver waiter.
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(50));
             // maximize the window.
             _driver.Manage().Window.Maximize();
- 
-            // if the cookie was not retrieved successfully.
+
+            //if the cookie was not retrieved successfully.
             if (GetCookie(_captcha) == false)
             {
                 Console.WriteLine("Failed to retrieve authentication cookie.");
             
                 return;
             }
-            
+
             if (Login(_username, _password) == false)
             {
                 return;
             }
 
             Thread.Sleep(5000);
-            
+
             foreach (var url in GetFreeGamesUrls())
             {
                 ClaimGame(url);
             }
-            
+
             Console.WriteLine("process finished");
         }
-        
+
         private static bool ValidateArguments()
         {
             if (string.IsNullOrEmpty(_username) || string.IsNullOrEmpty(_password) || string.IsNullOrEmpty(_captcha))
             {
                 Console.WriteLine("missing arguments");
-                
+
                 return false;
             }
+
             try
             {
                 var mailAddress = new MailAddress(_username);
-            } 
-            catch(FormatException)
+            }
+            catch (FormatException)
             {
                 Console.WriteLine("email address is not valid");
-                
+
                 return false;
             }
+
             if (new Regex("^https:\\/\\/accounts.hcaptcha.com\\/verify_email\\/[0-9a-z-]+$").IsMatch(_captcha) == false)
             {
                 Console.WriteLine("captcha url is not valid");
 
                 return false;
             }
+
             return true;
         }
 
@@ -143,33 +146,37 @@ namespace epic_claimer
 
         private static bool Login(string user, string pass)
         {
-            Console.Write("Logging in : ");
-
-
-            _driver.Navigate().GoToUrl("https://www.epicgames.com/id/login/");
-                
-            Thread.Sleep(5000);
+            const int maxTries = 5;
             
-            AddEpicCookies();
+            _driver.Navigate().GoToUrl("https://www.epicgames.com/id/login/");
             
             GetElement("//div[@aria-label=\"Sign in with Epic Games\"]").Click();
-
-            GetElement("//input[@name=\"email\"]").SendKeys(user);
-            GetElement("//input[@name=\"password\"]").SendKeys(pass);
-
-            Thread.Sleep(5000);
-
-            GetElement("//span[text()=\"Log in now\"]").Click();
-
-            // wait for this element to be displayed
-            if (_wait.Until(x => x.FindElement(By.Id("egLogo")).Displayed))
+            
+            for (var i = 0; i < maxTries; i++)
             {
-                Console.WriteLine("success");
+                Console.Write($"{i + 1}/{maxTries} Logging in : ");
+                
+                Thread.Sleep(2000);
 
-                return true;
+                AddEpicCookies();
+                
+                GetElement("//input[@name=\"email\"]").SendKeys(user);
+                GetElement("//input[@name=\"password\"]").SendKeys(pass);
+
+                Thread.Sleep(3000);
+
+                GetElement("//span[text()=\"Log in now\"]").Click();
+
+                // wait for this element to be displayed
+                if(GetElement("//div[@id=\"egLogo\"]") != null)
+                {
+                    Console.WriteLine("success");
+
+                    return true;
+                }
+
+                Console.WriteLine("failed");
             }
-
-            Console.WriteLine("failed");
 
             return false;
         }
@@ -181,13 +188,15 @@ namespace epic_claimer
             _wait.Until(x => x.FindElement(By.XPath("//div[@data-component=\"CardGridDesktopBase\"]")).Displayed);
 
             Thread.Sleep(10000);
-            
-            var freeGameSection = new Regex("<h1 class=\"css-.+?\">Free Games<\\/h1>(.+?)Sales and Specials").Match(_driver.PageSource);
-            
-            var freeGameUrls = new Regex("href=\"(/store/en-US/product.+?)>").Matches(freeGameSection.Groups[0].ToString());
+
+            var freeGameSection =
+                new Regex("<h1 class=\"css-.+?\">Free Games<\\/h1>(.+?)Sales and Specials").Match(_driver.PageSource);
+
+            var freeGameUrls =
+                new Regex("href=\"(/store/en-US/product.+?)\">").Matches(freeGameSection.Groups[0].ToString());
 
             var urls = freeGameUrls.ToList().Select(url => $"https://www.epicgames.com{url.Groups[1]}");
-                
+
             return urls;
         }
 
@@ -205,7 +214,7 @@ namespace epic_claimer
 
                 return;
             }
-            
+
             // Click the get button.
             GetElement("//button[@data-testid=\"purchase-cta-button\"]").Click();
             Thread.Sleep(5000);
@@ -214,7 +223,7 @@ namespace epic_claimer
             Thread.Sleep(5000);
             // click the agree button
             GetElements("//button[@class=\"btn btn-primary\"]")[1].Click();
-            
+
             Thread.Sleep(5000);
 
             Console.WriteLine("Claimed");
@@ -222,16 +231,31 @@ namespace epic_claimer
 
         private static List<IWebElement> GetElements(string xPath)
         {
-            _wait.Until(x => x.FindElements(By.XPath(xPath)));
+            try
+            {
+                _wait.Until(x => x.FindElements(By.XPath(xPath)));
 
-            return _driver.FindElements(By.XPath(xPath)).ToList();
+                return _driver.FindElements(By.XPath(xPath)).ToList();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         private static IWebElement GetElement(string xPath)
         {
-            _wait.Until(x => x.FindElement(By.XPath(xPath)));
+            try
+            {
+                _wait.Until(x => x.FindElement(By.XPath(xPath)));
 
-            return _driver.FindElement(By.XPath(xPath));
+                return _driver.FindElement(By.XPath(xPath));
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
