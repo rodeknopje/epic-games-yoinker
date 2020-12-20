@@ -143,7 +143,7 @@ namespace epic_claimer
 
         private static bool Login(string user, string pass)
         {
-            const int maxTries = 5;
+            const int maxTries = 15;
 
             _driver.Navigate().GoToUrl("https://www.epicgames.com/id/login/");
 
