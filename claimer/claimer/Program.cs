@@ -223,10 +223,10 @@ namespace epic_claimer
 
             // Click the get button.
             GetElement("//button[@data-testid=\"purchase-cta-button\"]").Click();
-            Thread.Sleep(5000);
+            Thread.Sleep(15000);
             // Click place order button
             GetElement("//button[@class=\"btn btn-primary\"]").Click();
-            Thread.Sleep(5000);
+            Thread.Sleep(15000);
             // click the agree button
             GetElements("//button[@class=\"btn btn-primary\"]")[1].Click();
 
