@@ -16,6 +16,8 @@ Inspritation for this project came from [xuac/claim-epic-freebies](https://githu
    Fill you epic email in the `USERNAME` field and your password in the `PASS` field.
    For the `CAPTCHA` field go to this [link](https://dashboard.hcaptcha.com/signup?type=accessibility) and fill sign up for Accessibility Access. After signing up go to your mail,    right click the button in the mail and press "copy url adress". Paste the adress in your `CAPTCHA` secret it should look like this `https://accounts.hcaptcha.com/verify_email/00000000-1a1a-2b2b-3c3c-1a2b3c4d5e6f`, two-factor authentication should be disabled for now.
    
+   You can also retrieve Telegram notifications when the program claims or fails to claim a game, to do that search in telegram for the bot "Epic games yoinker" and send him a message it wil respond with an id. Create a new secret `TELEGRAM` and paste the id there
+   
    
    
 
