@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Mail;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-
 
 namespace epic_claimer
 {
@@ -21,18 +24,21 @@ namespace epic_claimer
         private static string _password;
 
         private static string _captcha;
+        private static string _telegram;
 
-        private static void Main(string[] args)
+
+        private static async Task Main(string[] args)
         {
             _username = Environment.GetEnvironmentVariable("epicname");
             _password = Environment.GetEnvironmentVariable("epicpass");
-            _captcha = Environment.GetEnvironmentVariable("captcha");
+            _captcha  = Environment.GetEnvironmentVariable("captcha");
+            _telegram = Environment.GetEnvironmentVariable("telegram");
 
             if (ValidateArguments() == false)
             {
                 return;
             }
-
+            
             // create an instance of the webdriver
             _driver = new ChromeDriver();
             // create an instance of the webdriver waiter.
@@ -45,12 +51,12 @@ namespace epic_claimer
             {
                 Console.WriteLine("Failed to retrieve authentication cookie.");
 
-                return;
+                return ;
             }
 
             if (Login(_username, _password) == false)
             {
-                return;
+                return ;
             }
 
             Thread.Sleep(5000);
@@ -194,9 +200,10 @@ namespace epic_claimer
             _wait.Until(x => x.FindElement(By.XPath("//div[@data-component=\"CardGridDesktopBase\"]")).Displayed);
 
             Thread.Sleep(10000);
-            
-            var urls = GetElements("//a[descendant::span[text()='Free Now']]").Select(element => element.GetAttribute("href")).ToList();
-            
+
+            var urls = GetElements("//a[descendant::span[text()='Free Now']]")
+                .Select(element => element.GetAttribute("href")).ToList();
+
             return urls;
         }
 
@@ -211,10 +218,9 @@ namespace epic_claimer
             if (_driver.PageSource.Contains("Owned</span>"))
             {
                 Console.WriteLine("already owned");
-
+                SendTelegram($"I tried to claim {url}, but you already have it.").Wait();
                 return;
             }
-
             try
             {
                 // Click the get button.
@@ -227,9 +233,11 @@ namespace epic_claimer
                 GetElements("//button[@class=\"btn btn-primary\"]")[1].Click();
                 Thread.Sleep(5000);
                 Console.WriteLine("Claimed");
+                SendTelegram($"I claimed {url}, :)").Wait();
             }
-            catch (Exception e)
+            catch
             {
+                SendTelegram($"I tried to claim {url}, but i failed (╯°□°）╯︵ ┻━┻").Wait();
                 Console.WriteLine("failed");
                 throw;
             }
@@ -262,6 +270,32 @@ namespace epic_claimer
             catch
             {
                 return null;
+            }
+        }
+
+        private static async Task SendTelegram(string message)
+        {
+            if (string.IsNullOrEmpty(_telegram))
+            {
+                return;
+            }
+            const string url = "https://epic-games-yoinker-api.azurewebsites.net/message/send";
+            using var client = new HttpClient();
+            try
+            {
+                await client.PostAsync(url, new StringContent(
+                    JsonConvert.SerializeObject(new
+                    {
+                        Id = Convert.ToInt32(_telegram),
+                        Message = message
+                    }),
+                    Encoding.UTF8,
+                    "application/json"
+                ));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }
