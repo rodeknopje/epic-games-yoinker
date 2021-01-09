@@ -235,13 +235,13 @@ namespace epic_claimer
             {
                 // Click the get button.
                 GetElement("//button[@data-testid=\"purchase-cta-button\"]").Click();
-                Thread.Sleep(75000);
+                Thread.Sleep(10000);
                 // Click place order button
                 GetElement("//button[@class=\"btn btn-primary\"]").Click();
-                Thread.Sleep(75000);
+                Thread.Sleep(10000);
                 // click the agree button
                 GetElements("//button[@class=\"btn btn-primary\"]")[1].Click();
-                Thread.Sleep(75000);
+                Thread.Sleep(10000);
                 Console.WriteLine("Claimed");
                 SendTelegram(url, Status.Success);
             }
@@ -285,6 +285,7 @@ namespace epic_claimer
 
         private static void SendTelegram(string url, Status status)
         {
+            Console.Write("Sending telegram message... ");
             if (string.IsNullOrEmpty(_telegram))
             {
                 return;
@@ -302,10 +303,11 @@ namespace epic_claimer
                     Encoding.UTF8,
                     "application/json"
                 )).Wait();
+                Console.WriteLine("success.");
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
+                Console.WriteLine("failed.");
             }
         }
     }
