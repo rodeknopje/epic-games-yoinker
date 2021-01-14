@@ -186,10 +186,25 @@ namespace epic_claimer
 
                 Thread.Sleep(1000);
 
-                GetElement("//span[text()=\"Log in now\"]").Click();
+ 
+                if (_driver.Url != loginUrl)
+                {
+                    Console.WriteLine("success");
 
-                Thread.Sleep(10000);
+                    return true;
+                }
 
+                try
+                {
+                    GetElement("//span[text()=\"Log in now\"]").Click();
+                    
+                    Thread.Sleep(20000);
+                }
+                catch
+                {
+                    // ignored
+                }
+                
                 if (_driver.Url != loginUrl)
                 {
                     Console.WriteLine("success");
@@ -248,7 +263,6 @@ namespace epic_claimer
             catch
             {
                 SendTelegram(url, Status.Failed);
-                Console.WriteLine("failed");
                 throw;
             }
         }
@@ -274,6 +288,8 @@ namespace epic_claimer
             try
             {
                 _wait.Until(x => x.FindElement(By.XPath(xPath)));
+                
+                
 
                 return _driver.FindElement(By.XPath(xPath));
             }
