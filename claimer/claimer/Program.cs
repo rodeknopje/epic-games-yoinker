@@ -253,7 +253,7 @@ namespace epic_claimer
                 Thread.Sleep(10000);
                 // Click place order button
                 GetElement("//button[@class=\"btn btn-primary\"]").Click();
-                Thread.Sleep(10000);
+                Thread.Sleep(20000);
                 // click the agree button
                 GetElements("//button[@class=\"btn btn-primary\"]")[1].Click();
                 Thread.Sleep(10000);
