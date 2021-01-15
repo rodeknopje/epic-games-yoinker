@@ -251,6 +251,17 @@ namespace epic_claimer
                 // Click the get button.
                 GetElement("//button[@data-testid=\"purchase-cta-button\"]").Click();
                 Thread.Sleep(10000);
+
+                if (_driver.PageSource.ToLower().Contains("please read this agreement carefully"))
+                {
+                    GetElement("//input[@id=\"agree\"]").Click();
+                    Thread.Sleep(1000);
+                    GetElement("//button[descendant::span[text()='Accept']]").Click();
+                    Thread.Sleep(1000);
+                    GetElement("//button[@data-testid=\"purchase-cta-button\"]").Click();
+                    Thread.Sleep(10000);
+                }
+                
                 // Click place order button
                 GetElement("//button[@class=\"btn btn-primary\"]").Click();
                 Thread.Sleep(20000);
