@@ -73,7 +73,26 @@ namespace epic_claimer
             // Retrieve the game urls.
             foreach (var url in GetFreeGamesUrls())
             {
-                ClaimGame(url);
+                var status = Status.Failed;
+                
+                for (var i = 0; i < 5; i++)
+                {
+                    status = ClaimGame(url);
+                    
+                    if (status == Status.Success)
+                    {
+                        SendTelegram(url, status);
+                        break;
+                    }
+                    if (status == Status.Owned)
+                    {
+                        break;
+                    }
+                }
+                if (status == Status.Failed)
+                {
+                    SendTelegram(url,status);
+                }
             }
 
             Console.WriteLine("process finished");
@@ -232,7 +251,7 @@ namespace epic_claimer
             return urls;
         }
 
-        private static void ClaimGame(string url)
+        private static Status ClaimGame(string url)
         {
             Console.Write($"claiming {url} : ");
 
@@ -243,15 +262,15 @@ namespace epic_claimer
             if (_driver.PageSource.Contains("Owned</span>"))
             {
                 Console.WriteLine("already owned");
-                return;
+                
+                return Status.Owned;
             }
 
             try
             {
                 // Click the get button.
                 GetElement("//button[@data-testid=\"purchase-cta-button\"]").Click();
-                Thread.Sleep(10000);
-
+                Thread.Sleep(20000);
                 if (_driver.PageSource.ToLower().Contains("please read this agreement carefully"))
                 {
                     GetElement("//input[@id=\"agree\"]").Click();
@@ -259,7 +278,7 @@ namespace epic_claimer
                     GetElement("//button[descendant::span[text()='Accept']]").Click();
                     Thread.Sleep(1000);
                     GetElement("//button[@data-testid=\"purchase-cta-button\"]").Click();
-                    Thread.Sleep(10000);
+                    Thread.Sleep(20000);
                 }
                 
                 // Click place order button
@@ -267,14 +286,16 @@ namespace epic_claimer
                 Thread.Sleep(20000);
                 // click the agree button
                 GetElements("//button[@class=\"btn btn-primary\"]")[1].Click();
-                Thread.Sleep(10000);
+                Thread.Sleep(5000);
+                
                 Console.WriteLine("Claimed");
-                SendTelegram(url, Status.Success);
+                return Status.Success;
             }
             catch
             {
-                SendTelegram(url, Status.Failed);
-                throw;
+                Console.WriteLine("Failed");
+                
+                return Status.Failed;
             }
         }
 
@@ -341,7 +362,9 @@ namespace epic_claimer
 
     public enum Status
     {
+        // only status 0 and 1 can be passed to the telegram api.
         Success = 0,
-        Failed  = 1
+        Failed  = 1,
+        Owned = 2,
     }
 }
