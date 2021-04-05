@@ -1,3 +1,5 @@
+![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) Repo is currently not working!
+
 # epic-games-yoinker
 automatically yoink the free games from epic :)
 
